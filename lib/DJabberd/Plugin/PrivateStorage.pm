@@ -83,9 +83,9 @@ sub _get_privatestorage {
     $logger->info("Get private storage for user : $user, $element ");
     my $on_response = sub {
         my $cb = shift;
-        my $result = shift;
+        my $xml = shift;
         $iq->send_reply('result', qq(<query xmlns="jabber:iq:private">) 
-                                  . $result 
+                                  . $xml
                                   . qq(</query>) );
     };
     my $on_error = sub{
@@ -125,6 +125,7 @@ sub _set_privatestorage {
 
     my $content = $iq->first_element()->first_element();
     my $element = $content->element();
+    my $xml = $content->as_xml();
 
     $logger->info("Set private storage for user '$user', on $element");
     my $on_error = sub {
@@ -135,7 +136,7 @@ sub _set_privatestorage {
     };
 
     $vhost->run_hook_chain(phase => 'PrivateStorageSet',
-                           args => [ $user, $element, $content ],
+                           args => [ $user, $element, $xml ],
                            methods => {
                                success => $on_success,
                                error => $on_error,
